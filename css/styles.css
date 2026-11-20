@@ -23,4 +23,43 @@
 .sidebar::-webkit-scrollbar-thumb:hover{background:#bd6477}
 #main-nav,.side-label,.side-brand,.side-bottom{flex-shrink:0}
 .side-bottom{margin-top:24px;padding-top:10px;background:#fff}
+
+/* FIX: tarjetas debajo del texto del login */
+#auth-screen .auth-art {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch;
+}
+
+#auth-screen .auth-copy {
+    position: relative;
+    margin-top: 100px !important;
+    margin-bottom: 0 !important;
+    z-index: 2;
+}
+
+#auth-screen .auth-still {
+    position: relative !important;
+    top: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+
+    width: 330px;
+    height: 210px;
+    margin: 45px 0 65px auto !important;
+    flex-shrink: 0;
+    z-index: 2;
+}
+
+#auth-screen .still-card {
+    position: absolute !important;
+}
+
+/* Mantener el pie abajo */
+#auth-screen .auth-foot {
+    position: absolute;
+    bottom: 36px;
+}
+
 @media(max-width:850px){.sidebar{height:100vh;height:100dvh}}
