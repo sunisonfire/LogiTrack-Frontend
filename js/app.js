@@ -22,7 +22,55 @@ const labels={ENTRADA:'Entrada',SALIDA:'Salida',TRANSFERENCIA:'Transferencia',IN
 function esc(v=''){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function val(obj,path){return path.split('.').reduce((a,k)=>a?.[k],obj)}
 function toast(msg,error=false){const n=document.createElement('div');n.className='toast'+(error?' error':'');n.textContent=msg;$('#toast-region').append(n);setTimeout(()=>n.remove(),3600)}
-async function api(path,opts={}){const headers={'Content-Type':'application/json',...(opts.headers||{})};if(state.token)headers.Authorization='Bearer '+state.token;const res=await fetch(API+path,{...opts,headers,signal:AbortSignal.timeout(window.LOGITRACK_CONFIG?.REQUEST_TIMEOUT_MS||20000)});let data=null;if(res.status!==204){const t=await res.text();try{data=t?JSON.parse(t):null}catch{data=t}}if(!res.ok){if(res.status===401&&state.token){logout();throw Error('Tu sesión expiró. Ingresa nuevamente.')}throw Error(typeof data==='string'?data:(data?.message||data?.error||`Error ${res.status}: revisa los datos y permisos.`))}return data}
+
+async function api(path, opts = {}) {
+    const headers = {
+        'Content-Type': 'application/json',
+        'ngrok-skip-browser-warning': 'true',
+        ...(opts.headers || {})
+    };
+
+    if (state.token) {
+        headers.Authorization = 'Bearer ' + state.token;
+    }
+
+    const res = await fetch(API + path, {
+        ...opts,
+        headers,
+        signal: AbortSignal.timeout(
+            window.LOGITRACK_CONFIG?.REQUEST_TIMEOUT_MS || 20000
+        )
+    });
+
+    let data = null;
+
+    if (res.status !== 204) {
+        const t = await res.text();
+
+        try {
+            data = t ? JSON.parse(t) : null;
+        } catch {
+            data = t;
+        }
+    }
+
+    if (!res.ok) {
+        if (res.status === 401 && state.token) {
+            logout();
+            throw Error('Tu sesión expiró. Ingresa nuevamente.');
+        }
+
+        throw Error(
+            typeof data === 'string'
+                ? data
+                : data?.message ||
+                  data?.error ||
+                  `Error ${res.status}: revisa los datos y permisos.`
+        );
+    }
+
+    return data;
+}
 const isAdmin=()=>state.role==='ADMIN';
 function showAuth(){ $('#auth-screen').classList.remove('hidden');$('#app').classList.add('hidden')}
 function showApp(){ $('#auth-screen').classList.add('hidden');$('#app').classList.remove('hidden');$('#profile-name').textContent=state.user.nombre||'Studio user';$('#profile-role').textContent=isAdmin()?'ADMINISTRADORA':'COLABORADORA';$('#avatar-initial').textContent=(state.user.nombre||'S')[0].toUpperCase();$('#top-avatar').textContent=(state.user.nombre||'S')[0].toUpperCase();$('#today-label').textContent=new Intl.DateTimeFormat('es-CO',{weekday:'short',day:'numeric',month:'short'}).format(new Date());renderNav();navigate('dashboard')}
